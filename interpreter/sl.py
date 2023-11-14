@@ -17,7 +17,7 @@ file_name = sys.argv[1]
 tokens: list[str] = []
 with open(file_name) as program_file:
 
-    for token in program_file.read().split("\n"):
+    for token in program_file:
         token and tokens.append(token.strip())
 
 
@@ -26,9 +26,9 @@ with open(file_name) as program_file:
 #####################
 ast: list[dict[str, str]] = []
 for token in tokens:
-    if is_a_println(token):
-        print_value = token[8:]
-        ast.append({"OUTPUT": print_value[1:len(print_value)-1]})
+    match token.split(" ", 1):
+        case ["println", strings]:
+            ast.append({"OUTPUT": strings.strip("'\"")})
 
 ########
 # RUN! #
