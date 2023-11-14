@@ -6,7 +6,10 @@ import re
 argv = sys.argv
 
 if len(argv) < 2:
-    print(f"Error: Please enter the slow-laggy programm file.\nexmaple: {argv[0]} test.sl")
+    print(
+        "Error: Please enter the slow-laggy "
+        f"programm file.\nexmaple: {argv[0]} test.sl"
+)
     exit()
 
 file_name = argv[1]
@@ -28,11 +31,14 @@ with open(file_name) as program_file:
 #####################
 ast: list[dict[str, str]] = []
 for token in filter(lambda line: not line.startswith("`"), tokens):
-    match token.split(" ", 1):
-        case ["println", strings]:
-            ast.append({"OUTPUT": strings.strip("'\"")})
-        case _:
-            raise(SyntaxError("look for it yourself i'm not gonna point to it xd"))
+    keyword = token.split(" ", 1)
+
+    if is_a_println(keyword[0]):
+        ast.append({"OUTPUT": keyword[1].strip("'\"")})
+    else:
+        # TODO: Create a error handling. we don't want use the python exceptions!
+        # TODO: use something like this for exceptions => Error: if you want to i tell you the problem you need to wait for 1h
+        raise (SyntaxError("look for it yourself i'm not gonna point to it xd"))
 
 ########
 # RUN! #
@@ -41,4 +47,3 @@ for ex in ast:
     match ex:
         case {"OUTPUT": string}:
             println(string)
-
