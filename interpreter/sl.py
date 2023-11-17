@@ -1,7 +1,6 @@
 import sys
-from detectors import is_a_println
+from detectors import is_a_println, is_a_if,is_a_endif, check_if_condition
 from runners._io import println
-import re
 
 argv = sys.argv
 
@@ -22,23 +21,39 @@ tokens: list[str] = []
 with open(file_name) as program_file:
 
     for token in program_file:
-        if re.match(r"\S+", token):
-            token and tokens.append(token.strip())
-
+        if not token.startswith("#"):
+            if token != "":
+                token and tokens.append(token.strip())
 
 #####################
 # Parse the Tokens! #
 #####################
 ast: list[dict[str, str]] = []
-for token in filter(lambda line: not line.startswith("`"), tokens):
-    keyword = token.split(" ", 1)
+inside_if = False
+check_condition = False
+do_rest = True
+for token in tokens:
+    if is_a_endif(token):
+        inside_if = False
+        do_rest = True
+        continue
 
-    if is_a_println(keyword[0]):
-        ast.append({"OUTPUT": keyword[1].strip("'\"")})
-    else:
-        # TODO: Create a error handling. we don't want use the python exceptions!
-        # TODO: use something like this for exceptions => Error: if you want to i tell you the problem you need to wait for 1h
-        raise (SyntaxError("look for it yourself i'm not gonna point to it xd"))
+    if is_a_if(token):
+        inside_if = True
+        check_condition = check_if_condition(token)
+
+    if inside_if and check_condition is False:
+        do_rest = False
+        continue
+
+    if do_rest:
+        if is_a_println(token):
+            ast.append({"OUTPUT": token.split(" ", 1)[1].strip("'\"")})
+
+    # else:
+    #     # TODO: Create a error handling. we don't want use the python exceptions!
+    #     # TODO: use something like this for exceptions => Error: if you want to i tell you the problem you need to wait for 1h
+    #     raise (SyntaxError("look for it yourself i'm not gonna point to it xd"))
 
 ########
 # RUN! #

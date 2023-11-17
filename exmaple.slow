@@ -1,4 +1,15 @@
 println "Hello World"
 
-` ugly comment
+# comment
+
 println "A message for the WORLD!"
+
+if 3 > 4:
+    println "It's impossible"
+endif
+
+if 3 < 4:
+    println "Of course!"
+endif
+
+println "END OF THE WORLD!"
